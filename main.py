@@ -5,6 +5,7 @@ import datetime
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.core.image import Image as CoreImage
@@ -24,34 +25,39 @@ from history_rates import FxtopRate
 os.environ['SSL_CERT_FILE']=certifi.where()
 
 register_matplotlib_converters()
-
-class ImageScreen(BoxLayout):
+class ImageScreen(StackLayout):
     def __init__(self, **kwargs):
         super(ImageScreen,self).__init__(**kwargs)
-        self.cols = 1
+        #self.cols = 1
         self.image = Image(source="out.png")
         self.add_widget(self.image)
 
 
-class RatesScreen(GridLayout):
+
+class RatesScreen(StackLayout):
     def __init__(self, **kwargs):
         super(RatesScreen, self).__init__(**kwargs)
-        self.cols = 4
-        self.rows = 2
+        self._from = 'CHF'
+        self._to = 'RUB'
+        #self.cols = 4
+        #self.rows = 2
         self.dropdownFrom = DropDown()
         self.dropdownTo = DropDown()
 
         self.buttonFrom = self.createButton("From", self.dropdownFrom, True)
-        self.label = Label(text='Currency rates', font_size='20sp', size_hint_y=None, size_hint_x=0, height=40)
         self.buttonTo = self.createButton("To", self.dropdownTo, False)
 
-        self.add_widget(self.label)
         self.add_widget(self.buttonFrom)
         self.add_widget(self.buttonTo)
 
+        #self.image = Image(source="", size=(900, 900))
+        #self.add_widget(self.image)
+      
         btn = Button(text='Show',size_hint_y=None, size_hint_x=None, height=40)
         btn.bind(on_release=lambda btn: self.on_release(btn))
         self.add_widget(btn)
+        self.label = Label(text='Currency rates', font_size='20sp', pos=(0,0), size_hint_y=None, size_hint_x=1, halign="right", width=100, height=40)
+        self.add_widget(self.label)
 
         self.image_screen = ImageScreen()
         self.add_widget(self.image_screen)
@@ -136,6 +142,7 @@ class MyApp(App):
 
     def build(self):
         return RatesScreen()
+
 
 
 MyApp().run()
