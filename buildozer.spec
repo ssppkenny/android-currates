@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = Currency Rates
 
 # (str) Package name
 package.name = myapp

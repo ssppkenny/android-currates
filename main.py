@@ -6,6 +6,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.core.image import Image as CoreImage
 from io import BytesIO
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -24,27 +25,37 @@ os.environ['SSL_CERT_FILE']=certifi.where()
 
 register_matplotlib_converters()
 
+class ImageScreen(BoxLayout):
+    def __init__(self, **kwargs):
+        super(ImageScreen,self).__init__(**kwargs)
+        self.cols = 1
+        self.image = Image(source="out.png")
+        self.add_widget(self.image)
+
 
 class RatesScreen(GridLayout):
     def __init__(self, **kwargs):
         super(RatesScreen, self).__init__(**kwargs)
-        self.cols = 3
+        self.cols = 4
         self.rows = 2
         self.dropdownFrom = DropDown()
         self.dropdownTo = DropDown()
 
         self.buttonFrom = self.createButton("From", self.dropdownFrom, True)
+        self.label = Label(text='Currency rates', font_size='20sp', size_hint_y=None, size_hint_x=0, height=40)
         self.buttonTo = self.createButton("To", self.dropdownTo, False)
 
+        self.add_widget(self.label)
         self.add_widget(self.buttonFrom)
         self.add_widget(self.buttonTo)
 
-        self.image = Image(source="", size=(900, 900))
-        self.add_widget(self.image)
-
-        btn = Button(text='Show', size_hint_x= None, size_hint_y=None, height=40)
+        btn = Button(text='Show',size_hint_y=None, size_hint_x=None, height=40)
         btn.bind(on_release=lambda btn: self.on_release(btn))
         self.add_widget(btn)
+
+        self.image_screen = ImageScreen()
+        self.add_widget(self.image_screen)
+
 
     def get_from(self):
         return self._from
@@ -57,7 +68,7 @@ class RatesScreen(GridLayout):
         _to = self.get_to()
         Cache.remove('kv.image')
         Cache.remove('kv.texture')
-        self.image.texture = self.get_texture()
+        self.image_screen.image.texture = self.get_texture()
         ##self.image.reload()
 
     def create_figure(self, date_str, from_cur, to_cur, years):
@@ -99,7 +110,7 @@ class RatesScreen(GridLayout):
             dropdown.add_widget(btn2)
 
 
-        button = Button(text=s, size=(100, 35), size_hint=(None, None), pos=(0, 0))
+        button = Button(text=s,size_hint_y=None, size_hint_x=None, height=40)
         button.bind(on_release=lambda btn: self.dropdown_on_release(btn, dropdown))
 
         dropdown.bind(on_select=lambda instance, x: self.set_button_text(button, x))
@@ -113,18 +124,15 @@ class RatesScreen(GridLayout):
         output = BytesIO()
         FigureCanvas(fig).print_png(output)
 
+        # self.buttonFrom.bind(on_release = lambda btn: ddh.select(btn))
+
         with open("out.png", "wb") as outfile:
             outfile.write(output.getbuffer())
             return CoreImage.load("out.png").texture
 
 
+
 class MyApp(App):
-
-    def on_pause(self):
-        return True
-
-    def on_resume(self):
-        pass
 
     def build(self):
         return RatesScreen()
