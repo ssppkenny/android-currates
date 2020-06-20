@@ -8,6 +8,7 @@ from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from matplotlib.figure import Figure
 import numpy as np
+import multiprocessing as mp
 
 
 plt.style.use('fivethirtyeight')
@@ -61,7 +62,7 @@ class FxtopRate:
     
     def get_rates(self):
         selection = self._selection
-        pool = ThreadPoolExecutor(4)
+        pool = ThreadPoolExecutor(mp.cpu_count())
         reqs = []
         for i in range(self._years,0, -1):
             req = pool.submit(self._data_from_selection, selection)
