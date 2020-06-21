@@ -108,10 +108,8 @@ class Buttons(BoxLayout):
         FigureCanvas(fig).print_png(output)
 
         # self.buttonFrom.bind(on_release = lambda btn: ddh.select(btn))
-
-        with open("out.png", "wb") as outfile:
-            outfile.write(output.getbuffer())
-            return CoreImage.load("out.png").texture
+        output.seek(0)
+        return CoreImage.load(output, ext='png').texture
 
 
     def createYearsButton(self, s, dropdown):
