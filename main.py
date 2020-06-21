@@ -16,6 +16,7 @@ from pandas.plotting import register_matplotlib_converters
 from kivy.cache import Cache
 from kivy.core.window import Window
 import certifi, os
+from kivy.uix.popup import Popup
 
 register_matplotlib_converters()
 from kivy.app import App
@@ -54,8 +55,8 @@ class Buttons(BoxLayout):
         self.years = self.createYearsButton("Years", self.yearsDropdown)
         self.add_widget(self.years)
 
-        btn = Button(text='Show',size_hint_y=None, size_hint_x=None, height=40)
-        btn.bind(on_release=lambda btn: self.on_release(btn))
+        btn = Button(text='Show',size_hint_y=None, size_hint_x=None, height=60)
+        btn.bind(on_release=lambda btn: self.on_release(btn), on_press=lambda btn: self.on_press(btn))
         self.add_widget(btn)
 
 
@@ -65,13 +66,17 @@ class Buttons(BoxLayout):
     def get_to(self):
         return self._to
 
+    def on_press(self, btn):
+        self.image = Image(source='calculator.png', anim_loop=1)
+        self.popup = Popup(title='Loading rates...', content=self.image, size=(500, 500), size_hint=(None,None))
+        self.popup.open()
+
     def on_release(self, btn):
-        _from = self.get_from()
-        _to = self.get_to()
         Cache.remove('kv.image')
         Cache.remove('kv.texture')
         self.parent.image_screen.image.texture = self.get_texture()
         ##self.image.reload()
+        self.popup.dismiss()
 
     def create_figure(self, date_str, from_cur, to_cur, years):
         fxtop = FxtopRate(date_str, from_cur, to_cur, years)
@@ -114,10 +119,10 @@ class Buttons(BoxLayout):
 
     def createYearsButton(self, s, dropdown):
         for i in range(1,20):
-            btn = Button(text=str(i), size_hint_y=None, size_hint_x=None, height=40)
+            btn = Button(text=str(i), size_hint_y=None, size_hint_x=None, height=60)
             btn.bind(on_release=lambda btn: self.dropdown_select(btn, dropdown))
             dropdown.add_widget(btn)
-        button = Button(text=s,size_hint_y=None, size_hint_x=None, height=40)
+        button = Button(text=s,size_hint_y=None, size_hint_x=None, height=60)
         button.bind(on_release=lambda btn: self.dropdown_on_release(btn, dropdown))
 
         dropdown.bind(on_select=lambda instance, x: self.set_button_text(button, x))
@@ -128,17 +133,17 @@ class Buttons(BoxLayout):
         currencies = ['CHF','RUB','USD', 'EUR']
         if _from:
             for cur in currencies:
-                btn = Button(text=cur, size_hint_y=None, size_hint_x=None, height=40)
+                btn = Button(text=cur, size_hint_y=None, size_hint_x=None, height=60)
                 btn.bind(on_release=lambda btn: self.dropdown_from_select(btn, dropdown))
                 dropdown.add_widget(btn)
         else:
             for cur in currencies:
-                btn = Button(text=cur, size_hint_y=None, size_hint_x=None, height=40)
+                btn = Button(text=cur, size_hint_y=None, size_hint_x=None, height=60)
                 btn.bind(on_release=lambda btn: self.dropdown_to_select(btn, dropdown))
                 dropdown.add_widget(btn)
 
 
-        button = Button(text=s,size_hint_y=None, size_hint_x=None, height=40)
+        button = Button(text=s,size_hint_y=None, size_hint_x=None, height=60)
         button.bind(on_release=lambda btn: self.dropdown_on_release(btn, dropdown))
 
         dropdown.bind(on_select=lambda instance, x: self.set_button_text(button, x))
